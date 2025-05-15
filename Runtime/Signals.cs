@@ -1,42 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-
 namespace THEBADDEST.Communication
 {
-
-
-	public interface IObserver<in T>
-	{
-
-		void OnNotify(T signalData);
-
-	}
-
-	public class EventObserver<T> : IObserver<T>
-	{
-
-		private readonly Action<T> eventDelegate;
-
-		public EventObserver(Action<T> eventDelegate)
-		{
-			this.eventDelegate = eventDelegate;
-		}
-
-		public void OnNotify(T signalData)
-		{
-			eventDelegate?.Invoke(signalData);
-		}
-
-	}
-
-
 	/// <summary>
 	/// Represents a signals manager that allows communication between different parts of the application using events and observers.
 	/// </summary>
 	public class Signals
 	{
-
 		private static Signals instance;
 
 		/// <summary>
@@ -50,7 +21,6 @@ namespace THEBADDEST.Communication
 				{
 					instance = new Signals();
 				}
-
 				return instance;
 			}
 		}
@@ -104,7 +74,6 @@ namespace THEBADDEST.Communication
 			Instance.TriggerInternal(signalName, signalData);
 		}
 
-
 		private void SubscribeInternal<T>(string signalName, IObserver<T> observer)
 		{
 			if (string.IsNullOrEmpty(signalName))
@@ -114,12 +83,10 @@ namespace THEBADDEST.Communication
 
 			if (!observers.TryGetValue(signalName, out var signalObservers))
 			{
-				// Create a new list of observers for the signal name
-				signalObservers       = new List<IObserver<object>>();
+				signalObservers = new List<IObserver<object>>();
 				observers[signalName] = signalObservers;
 			}
 
-			// Add the observer to the list of observers for the signal name
 			signalObservers.Add(observer as IObserver<object>);
 		}
 
@@ -132,7 +99,6 @@ namespace THEBADDEST.Communication
 
 			if (observers.TryGetValue(signalName, out var signalObservers))
 			{
-				// Remove the observer from the list of observers for the signal name
 				signalObservers.Remove(observer as IObserver<object>);
 			}
 		}
@@ -144,7 +110,6 @@ namespace THEBADDEST.Communication
 				throw new ArgumentNullException(nameof(signalName), "Invalid signal name");
 			}
 
-			// Remove all observers associated with the signal name
 			observers.Remove(signalName);
 		}
 
@@ -157,15 +122,11 @@ namespace THEBADDEST.Communication
 
 			if (observers.TryGetValue(signalName, out var signalObservers))
 			{
-				// Notify all subscribed observers with the signal data
 				foreach (var observer in signalObservers)
 				{
 					(observer as IObserver<T>)?.OnNotify(signalData);
 				}
 			}
 		}
-
 	}
-
-
 }
